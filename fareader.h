@@ -1,6 +1,6 @@
 /**
  *  @file fareader.h
- *  @version 0.7.0-dev0
+ *  @version 0.7.1-dev0
  *  @date Mon Dec  2 12:05:03 CST 2019
  *  @copyright %COPYRIGHT%
  *  @brief FIXME
