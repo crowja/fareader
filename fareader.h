@@ -1,7 +1,7 @@
 /**
  *  @file fareader.h
  *  @version 0.7.1-dev0
- *  @date Mon Dec  2 12:05:03 CST 2019
+ *  @date Tue Dec 10 15:17:30 CST 2019
  *  @copyright %COPYRIGHT%
  *  @brief FIXME
  *  @details FIXME
@@ -27,7 +27,7 @@ struct fareader *fareader_new(char *fname);
  *  @brief Clean up and free an fareader structure.
  *  @param p Pointer to an fareader object.
  */
-void        fareader_free(struct fareader *p);
+void        fareader_free(struct fareader **pp);
 
 /**
  *  @brief Extend the internal read buffer size.

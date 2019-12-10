@@ -1,7 +1,7 @@
 /**
  *  @file fareader.c
  *  @version 0.7.1-dev0
- *  @date Mon Dec  2 12:05:03 CST 2019
+ *  @date Tue Dec 10 15:17:30 CST 2019
  *  @copyright %COPYRIGHT%
  *  @brief FIXME
  *  @details FIXME
@@ -51,8 +51,6 @@ struct fareader {
    gzFile      in;
 };
 
-/*** fareader_new() ***/
-
 struct fareader *
 fareader_new(char *fname)
 {
@@ -82,21 +80,16 @@ fareader_new(char *fname)
    return tp;
 }
 
-
-/*** fareader_free() ***/
-
 void
-fareader_free(struct fareader *p)
+fareader_free(struct fareader **pp)
 {
-   gzclose(p->in);
-   varstr_free(p->h);
-   varstr_free(p->s);
+   gzclose((*pp)->in);
+   varstr_free(&(*pp)->h);
+   varstr_free(&(*pp)->s);
 
-   _FREE(p);
+   _FREE(*pp);
+   *pp = NULL;
 }
-
-
-/*** fareader_version() ***/
 
 const char *
 fareader_version(void)
@@ -105,15 +98,11 @@ fareader_version(void)
    return version;
 }
 
-/*** fareader_buffersize() ***/
-
 int
 fareader_buffersize(struct fareader *p, unsigned size, unsigned extend)
 {
    return varstr_buffersize(p->s, size, extend);
 }
-
-/*** fareader_next() ***/
 
 int
 fareader_next(struct fareader *p, char **h, char **s)

@@ -13,7 +13,7 @@ main(int argc, char *argv[])
       printf("%s\n", s);
    }
 
-   fareader_free(r);
+   fareader_free(&r);
 
    return 0;
 }

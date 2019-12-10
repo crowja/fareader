@@ -57,15 +57,15 @@ test_constr(void)
 {
    struct fareader *z;
 
-   _printf_test_name("test_constr()", "fareader_new, fareader_free");
+   _printf_test_name("test_constr", "fareader_new, fareader_free");
 
    z = fareader_new(NULL);
    ASSERT("Constructor test", z);
-   fareader_free(z);
-
+   fareader_free(&z);
+   ASSERT_EQUALS(NULL, z);
 }
 
-#if 0                                            /* 14 yy */
+#if 0                                            /* 16 yy */
 static void
 test_stub(void)
 {
@@ -78,7 +78,8 @@ test_stub(void)
    ASSERT("Constructor test, pt 1", z);
    ASSERT("Here's a test ...", _two_doubles_equal(x, 1.23));
 
-   fareader_free(z);
+   fareader_free(&z);
+   ASSERT_EQUALS(NULL, z);
 }
 #endif
 

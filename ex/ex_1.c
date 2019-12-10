@@ -15,6 +15,7 @@ main(int argc, char *argv[])
       count += 1;
    }
 
-   fareader_free(r);
+   fareader_free(&r);
+
    return 0;
 }
