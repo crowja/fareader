@@ -7,5 +7,11 @@
     but it seems we need this flag.
 
 Nov 2019
+
 *   Added handling for when zlib is present (define macro HAVE\_ZLIB) and 
     otherwise. Currently only slightly tested.
+
+*   wget -P. https://raw.githubusercontent.com/crowja/varstr/master/varstr.c
+*   wget -P. https://raw.githubusercontent.com/crowja/varstr/master/varstr.h
+*   wget -Pt https://raw.githubusercontent.com/joewalnes/tinytest/master/tinytest.h
+
