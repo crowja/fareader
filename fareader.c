@@ -1,6 +1,6 @@
 /**
  *  @file fareader.c
- *  @version 0.7.1-dev0
+ *  @version 0.8.0-dev0
  *  @date Tue Dec 10 15:17:30 CST 2019
  *  @copyright %COPYRIGHT%
  *  @brief FIXME
@@ -94,7 +94,7 @@ fareader_free(struct fareader **pp)
 const char *
 fareader_version(void)
 {
-   static const char version[] = "0.7.1-dev0";
+   static const char version[] = "0.8.0-dev0";
    return version;
 }
 
