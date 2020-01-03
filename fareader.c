@@ -1,6 +1,6 @@
 /**
  *  @file fareader.c
- *  @version 0.8.0-dev0
+ *  @version 0.9.0-dev0
  *  @date Tue Dec 10 15:17:30 CST 2019
  *  @copyright 2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
@@ -93,7 +93,7 @@ fareader_free(struct fareader **pp)
 const char *
 fareader_version(void)
 {
-   static const char version[] = "0.8.0-dev0";
+   static const char version[] = "0.9.0-dev0";
    return version;
 }
 
