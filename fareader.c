@@ -142,10 +142,15 @@ fareader_next(struct fareader *p, char **h, char **s)
 
       if (p->rbuf_pos == p->rbuf_len) {
          p->rbuf_len = fread(p->rbuf, sizeof(*p->rbuf), p->rbuf_size, p->in);
-	 if (p->rbuf_len == 0) {
-	    p->state = s_at_end;
-	    return 0;
-	 }
+         if (p->rbuf_len == 0) {
+            p->state = s_at_end;
+            /* TODO are these correct? */
+            *h = varstr_str(p->h);
+            *s = varstr_str(p->s);
+
+            return strlen(*s) > 0 ? 1 : 0;
+            /* return 0; */
+         }
          p->rbuf_pos = 0;
          continue;
       }
@@ -153,7 +158,9 @@ fareader_next(struct fareader *p, char **h, char **s)
       c = p->rbuf[p->rbuf_pos];
       p->rbuf_pos++;
 
+#if 0
       printf("DEBUG Just read character %c\n", c);
+#endif
 
       switch (p->state) {
 
