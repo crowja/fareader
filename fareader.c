@@ -53,7 +53,7 @@ struct fareader {
    struct varstr *h;
    struct varstr *s;
    enum states state;
-   int        *rbuf;                        /* use int because we might want to include EOF in it */
+   char       *rbuf;                        /* use int because we might want to include EOF in it */
    unsigned    rbuf_len;
    unsigned    rbuf_pos;
    unsigned    rbuf_size;
@@ -88,7 +88,7 @@ fareader_new(char *fname)
 
    tp->rbuf_len = 0;
    tp->rbuf_pos = 0;
-   tp->rbuf_size = 0;
+   tp->rbuf_size = 31;
    tp->rbuf = NULL;
 
    return tp;
@@ -100,6 +100,8 @@ fareader_free(struct fareader **pp)
    gzclose((*pp)->in);
    varstr_free(&(*pp)->h);
    varstr_free(&(*pp)->s);
+   if (!_IS_NULL((*pp)->rbuf))
+      free((*pp)->rbuf);
 
    _FREE(*pp);
    *pp = NULL;
@@ -134,95 +136,106 @@ fareader_next(struct fareader *p, char **h, char **s)
    if (p->state == s_at_end)
       return 0;
 
-   while (0 != (p->rbuf_len = fread(p->rbuf, sizeof(*p->rbuf), p->rbuf_size, p->in))) {
+   printf("DEBUG In fareader_next, about to do a read\n");
 
-      while (p->rbuf_pos < p->rbuf_len) {
+   while (1) {
 
-         c = p->rbuf[p->rbuf_pos];
-	 /* TODO figue out where to increment p->rbuf_pos */
+      if (p->rbuf_pos == p->rbuf_len) {
+         p->rbuf_len = fread(p->rbuf, sizeof(*p->rbuf), p->rbuf_size, p->in);
+	 if (p->rbuf_len == 0) {
+	    p->state = s_at_end;
+	    return 0;
+	 }
+         p->rbuf_pos = 0;
+         continue;
+      }
 
-         switch (p->state) {
+      c = p->rbuf[p->rbuf_pos];
+      p->rbuf_pos++;
 
-            case s_at_start:
-               if (isspace(c)) {
-                  DEBUG_printf(("MADE IT TO s_at_start\t1\n"));
-                  continue;
-               }
-               else if (c == '>' || c == ';') {
-                  DEBUG_printf(("MADE IT TO s_at_start\t2\n"));
-                  p->state = s_in_h;
-               }
-               else {
-                  DEBUG_printf(("MADE IT TO s_at_start\t3\n"));
-                  varstr_catc(p->s, c);
-                  p->state = s_in_s;
-               }
-               break;
+      printf("DEBUG Just read character %c\n", c);
 
-            case s_in_h:
-               if (c == '\n') {
-                  DEBUG_printf(("MADE IT TO s_in_h\t1\n"));
-                  p->state = s_in_h_eol;
-               }
-               else {
-                  DEBUG_printf(("MADE IT TO s_in_h\t2\n"));
-                  varstr_catc(p->h, c);
-               }
-               break;
+      switch (p->state) {
 
-            case s_in_h_eol:
-               if (isspace(c)) {
-                  DEBUG_printf(("MADE IT TO s_in_h_eol\t1\n"));
-                  continue;
-               }
-               else if (c == '>' || c == ';') {
-                  DEBUG_printf(("MADE IT TO s_in_h_eol\t2\n"));
-                  p->state = s_in_h;             /* and emit FIXME */
-                  varstr_empty(p->h);
-                  varstr_empty(p->s);
-               }
-               else {
-                  DEBUG_printf(("MADE IT TO s_in_h_eol\t3\n"));
-                  varstr_catc(p->s, c);
-                  p->state = s_in_s;
-               }
-               break;
+         case s_at_start:
+            if (isspace(c)) {
+               DEBUG_printf(("MADE IT TO s_at_start\t1\n"));
+               continue;
+            }
+            else if (c == '>' || c == ';') {
+               DEBUG_printf(("MADE IT TO s_at_start\t2\n"));
+               p->state = s_in_h;
+            }
+            else {
+               DEBUG_printf(("MADE IT TO s_at_start\t3\n"));
+               varstr_catc(p->s, c);
+               p->state = s_in_s;
+            }
+            break;
 
-            case s_in_s:
-               if (c == '\n') {
-                  DEBUG_printf(("MADE IT TO s_in_s\t1\n"));
-                  p->state = s_in_s_eol;
-               }
-               else if (isspace(c)) {
-                  DEBUG_printf(("MADE IT TO s_in_s\t2\n"));
-                  continue;
-               }
-               else {
-                  DEBUG_printf(("MADE IT TO s_in_s\t2 with %c\n", c));
-                  varstr_catc(p->s, c);
-               }
-               break;
+         case s_in_h:
+            if (c == '\n') {
+               DEBUG_printf(("MADE IT TO s_in_h\t1\n"));
+               p->state = s_in_h_eol;
+            }
+            else {
+               DEBUG_printf(("MADE IT TO s_in_h\t2\n"));
+               varstr_catc(p->h, c);
+            }
+            break;
 
-            case s_in_s_eol:
-               if (isspace(c)) {
-                  DEBUG_printf(("MADE IT TO s_in_s_eol\t1\n"));
-                  continue;
-               }
-               else if (c == '>' || c == ';') {
-                  DEBUG_printf(("MADE IT TO s_in_s_eol\t2\n"));
-                  p->state = s_in_h;
-                  goto DONE; /* TODO here's where we have a complete sequence */
-               }
-               else {
-                  DEBUG_printf(("MADE IT TO s_in_s_eol\t3\n"));
-                  varstr_catc(p->s, c);
-                  p->state = s_in_s;
-               }
-               break;
+         case s_in_h_eol:
+            if (isspace(c)) {
+               DEBUG_printf(("MADE IT TO s_in_h_eol\t1\n"));
+               continue;
+            }
+            else if (c == '>' || c == ';') {
+               DEBUG_printf(("MADE IT TO s_in_h_eol\t2\n"));
+               p->state = s_in_h;                /* and emit FIXME */
+               varstr_empty(p->h);
+               varstr_empty(p->s);
+            }
+            else {
+               DEBUG_printf(("MADE IT TO s_in_h_eol\t3\n"));
+               varstr_catc(p->s, c);
+               p->state = s_in_s;
+            }
+            break;
 
-            default:
-               break;
-         }
+         case s_in_s:
+            if (c == '\n') {
+               DEBUG_printf(("MADE IT TO s_in_s\t1\n"));
+               p->state = s_in_s_eol;
+            }
+            else if (isspace(c)) {
+               DEBUG_printf(("MADE IT TO s_in_s\t2\n"));
+               continue;
+            }
+            else {
+               DEBUG_printf(("MADE IT TO s_in_s\t2 with %c\n", c));
+               varstr_catc(p->s, c);
+            }
+            break;
+
+         case s_in_s_eol:
+            if (isspace(c)) {
+               DEBUG_printf(("MADE IT TO s_in_s_eol\t1\n"));
+               continue;
+            }
+            else if (c == '>' || c == ';') {
+               DEBUG_printf(("MADE IT TO s_in_s_eol\t2\n"));
+               p->state = s_in_h;
+               goto DONE;                        /* TODO here's where we have a complete sequence */
+            }
+            else {
+               DEBUG_printf(("MADE IT TO s_in_s_eol\t3\n"));
+               varstr_catc(p->s, c);
+               p->state = s_in_s;
+            }
+            break;
+
+         default:
+            break;
       }
    }
    p->state = s_at_end;
