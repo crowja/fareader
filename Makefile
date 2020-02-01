@@ -3,10 +3,10 @@ SHELL = /bin/sh
 GCC_STRICT_FLAGS = -pedantic -ansi -W -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -O2
 OTHER_SOURCE =
 OTHER_INCLUDE = -I.
-CPPFLAGS = -I. $(OTHER_INCLUDE) -DHAVE_ZLIB
+CPPFLAGS = -I. $(OTHER_INCLUDE)
 #CPPFLAGS = -I. $(OTHER_INCLUDE) -DHAVE_ZLIB -DDEBUG
 CFLAGS = $(GCC_STRICT_FLAGS) 
-LDFLAGS = -lz
+LDFLAGS =
 LDFLAGS_EFENCE = -L/usr/local/lib -lefence $(LDFLAGS)
 #VALGRIND_FLAGS = --verbose --leak-check=full --undef-value-errors=yes --track-origins=yes
 VALGRIND_FLAGS =  --leak-check=summary --undef-value-errors=yes --track-origins=yes
@@ -64,7 +64,7 @@ echeck: fareader.o varstr.o
 	  && ( LD_PRELOAD=libefence.so ./t/a.out ); \
 	done 
 
-indent: stamp
+indent:
 	@indent $(INDENT_FLAGS) fareader.c
 	@indent $(INDENT_FLAGS) fareader.h
 	@indent $(INDENT_FLAGS) t/test.c
