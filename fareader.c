@@ -88,7 +88,7 @@ fareader_new(char *fname)
 
    tp->rbuf_len = 0;
    tp->rbuf_pos = 0;
-   tp->rbuf_size = 31;
+   tp->rbuf_size = 1024 * 32;
    tp->rbuf = NULL;
 
    return tp;
@@ -136,7 +136,7 @@ fareader_next(struct fareader *p, char **h, char **s)
    if (p->state == s_at_end)
       return 0;
 
-   printf("DEBUG In fareader_next, about to do a read\n");
+   DEBUG_printf(("DEBUG In fareader_next, about to do a read\n"));
 
    while (1) {
 
@@ -157,10 +157,6 @@ fareader_next(struct fareader *p, char **h, char **s)
 
       c = p->rbuf[p->rbuf_pos];
       p->rbuf_pos++;
-
-#if 0
-      printf("DEBUG Just read character %c\n", c);
-#endif
 
       switch (p->state) {
 

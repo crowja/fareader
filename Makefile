@@ -16,7 +16,7 @@ INDENT_FLAGS = -TFILE -Tsize_t -Tuint8_t -Tuint16_t -Tuint32_t -Tuint64_t
 .PHONY: check check-examples vcheck echeck indent stamp clean
 
 TESTS = t/test
-EXAMPLES = ex/ex01
+EXAMPLES = ex/ex01 ex/ex02
 
 fareader.o: fareader.c fareader.h 
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ fareader.c
@@ -69,6 +69,7 @@ indent:
 	@indent $(INDENT_FLAGS) fareader.h
 	@indent $(INDENT_FLAGS) t/test.c
 	@indent $(INDENT_FLAGS) ex/ex01.c
+	@indent $(INDENT_FLAGS) ex/ex02.c
 
 stamp:
 	@stamper.bash fareader.c
