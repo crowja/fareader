@@ -1,6 +1,6 @@
 /**
  *  @file varstr.h
- *  @version 3.1.1-dev0
+ *  @version 3.2.0-dev0
  *  @date Sun Feb 16, 2020 07:32:15 PM CST
  *  @copyright 2018-2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
