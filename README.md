@@ -1,4 +1,4 @@
-# fareader 0.9.0-dev0
+# fareader 0.9.0
 
 Read a file or stream of sequences in FASTA format:
 ```c

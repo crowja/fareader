@@ -1,6 +1,6 @@
 /**
  *  @file fareader.h
- *  @version 0.9.0-dev0
+ *  @version 0.9.0
  *  @date Sun Feb 16, 2020 07:47:25 PM CST
  *  @copyright 2019-2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
