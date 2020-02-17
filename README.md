@@ -1,6 +1,7 @@
 # fareader 0.9.0
 
 Read a file or stream of sequences in FASTA format:
+
 ```c
     struct fareader *r = fareader_new(NULL); /* from stdin */
     char       *h, *s;
@@ -10,7 +11,7 @@ Read a file or stream of sequences in FASTA format:
        printf("seq text is %s\n", s);
     }
      . . .
-    fareader_free(r);
+    fareader_free(&r);
 ```
 Input can be from stdin or from a file. And in either case the input can be gzip
 compressed, so there is no need to uncompress a file or stream explicitly before
