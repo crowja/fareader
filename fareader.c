@@ -1,8 +1,8 @@
 /**
  *  @file fareader.c
  *  @version 0.9.0-dev0
- *  @date Tue Dec 10 15:17:30 CST 2019
- *  @copyright 2020 John A. Crow <crowja@gmail.com>
+ *  @date Sun Feb 16, 2020 07:47:25 PM CST
+ *  @copyright 2019-2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
  */
 
@@ -32,15 +32,15 @@ typedef FILE *gzFile;
 #define DEBUG_printf(args)
 #endif
 
-#ifdef  _IS_NULL
-#undef  _IS_NULL
+#ifdef  IS_NULL
+#undef  IS_NULL
 #endif
-#define _IS_NULL(p)   ((NULL == (p)) ? (1) : (0))
+#define IS_NULL(p)   ((NULL == (p)) ? (1) : (0))
 
-#ifdef  _FREE
-#undef  _FREE
+#ifdef  FREE
+#undef  FREE
 #endif
-#define _FREE(p)      ((NULL == (p)) ? (0) : (free((p)), (p) = NULL))
+#define FREE(p)      ((NULL == (p)) ? (0) : (free((p)), (p) = NULL))
 
 #ifdef  _RBUFSIZ
 #undef  _RBUFSIZ
@@ -66,10 +66,10 @@ fareader_new(char *fname)
    struct fareader *tp;
 
    tp = (struct fareader *) malloc(sizeof(struct fareader));
-   if (_IS_NULL(tp))
+   if (IS_NULL(tp))
       return NULL;
 
-   if (_IS_NULL(fname))
+   if (IS_NULL(fname))
       tp->in = gzdopen(fileno(stdin), "r");
 
    else
@@ -100,10 +100,10 @@ fareader_free(struct fareader **pp)
    gzclose((*pp)->in);
    varstr_free(&(*pp)->h);
    varstr_free(&(*pp)->s);
-   if (!_IS_NULL((*pp)->rbuf))
+   if (!IS_NULL((*pp)->rbuf))
       free((*pp)->rbuf);
 
-   _FREE(*pp);
+   FREE(*pp);
    *pp = NULL;
 }
 
@@ -129,7 +129,7 @@ fareader_next(struct fareader *p, char **h, char **s)
    varstr_empty(p->h);
    varstr_empty(p->s);
 
-   if (_IS_NULL(p->rbuf)) {
+   if (IS_NULL(p->rbuf)) {
       p->rbuf = malloc(p->rbuf_size * sizeof(*p->rbuf));
    }
 
@@ -144,7 +144,6 @@ fareader_next(struct fareader *p, char **h, char **s)
          p->rbuf_len = fread(p->rbuf, sizeof(*p->rbuf), p->rbuf_size, p->in);
          if (p->rbuf_len == 0) {
             p->state = s_at_end;
-            /* TODO are these correct? */
             *h = varstr_str(p->h);
             *s = varstr_str(p->s);
 
@@ -257,5 +256,5 @@ fareader_next(struct fareader *p, char **h, char **s)
    return rc;
 }
 
-#undef _IS_NULL
-#undef _FREE
+#undef IS_NULL
+#undef FREE

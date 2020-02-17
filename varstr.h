@@ -1,13 +1,13 @@
 /**
  *  @file varstr.h
- *  @version 3.0.0-dev0
- *  @date Sat Feb  1 20:29:50 CST 2020
- *  @copyright 2020 John A. Crow <crowja@gmail.com>
+ *  @version 3.1.1-dev0
+ *  @date Sun Feb 16, 2020 07:32:15 PM CST
+ *  @copyright 2018-2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
  */
 
-#ifndef _VARSTR_H_
-#define _VARSTR_H_
+#ifndef VARSTR_H
+#define VARSTR_H
 
 struct varstr;
 
@@ -84,7 +84,9 @@ void        varstr_empty(struct varstr *p);
  *    represented by a varstr.
  *  @param[in, out] p is a struct varstr * created by varstr_new().
  */
-void        varstr_lrtrim(struct varstr *g);
+void        varstr_lrtrim(struct varstr *p);
+
+void        varstr_ltrim(struct varstr *p);
 
 /**
  *  @brief Set the extension size for a varstr object
@@ -100,6 +102,8 @@ unsigned    varstr_extend(struct varstr *p, unsigned extend);
  *  @details Same as varstr_extend().
  */
 unsigned    varstr_init(struct varstr *p, unsigned extend);
+
+void        varstr_rtrim(struct varstr *p);
 
 /**
  *  @brief Get the pointer to the internal buffer holding the string.
@@ -117,5 +121,8 @@ char       *varstr_str(struct varstr *p);
  *  @returns a copy of the string represented by the varstr.
  */
 char       *varstr_to_s(struct varstr *p);
+
+void        varstr_tolower(struct varstr *p);
+void        varstr_toupper(struct varstr *p);
 
 #endif

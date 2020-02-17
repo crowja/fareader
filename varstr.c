@@ -1,8 +1,8 @@
 /**
  *  @file varstr.c
- *  @version 3.0.0-dev0
- *  @date Sat Feb  1 20:29:50 CST 2020
- *  @copyright 2020 John A. Crow <crowja@gmail.com>
+ *  @version 3.1.1-dev0
+ *  @date Sun Feb 16, 2020 07:32:15 PM CST
+ *  @copyright 2018-2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
  */
 
@@ -10,20 +10,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <ctype.h>
 #include "varstr.h"
 
-#ifdef  _IS_NULL
-#undef  _IS_NULL
+#ifdef  IS_NULL
+#undef  IS_NULL
 #endif
-#define _IS_NULL(p)   ((NULL == (p)) ? (1) : (0))
+#define IS_NULL(p)   ((NULL == (p)) ? (1) : (0))
 
-#ifdef  _FREE
-#undef  _FREE
+#ifdef  FREE
+#undef  FREE
 #endif
-#define _FREE(p)      ((NULL == (p)) ? (0) : (free((p)), (p) = NULL))
+#define FREE(p)      ((NULL == (p)) ? (0) : (free((p)), (p) = NULL))
 
 struct varstr {
-   unsigned    len;
+   unsigned    len;                         /* like strlen() */
    unsigned    size;
    unsigned    extend;
    char       *x;
@@ -35,10 +36,11 @@ varstr_new(void)
    struct varstr *tp;
 
    tp = (struct varstr *) malloc(sizeof(struct varstr));
-   if (_IS_NULL(tp))
+   if (IS_NULL(tp))
       return NULL;
 
    tp->x = (char *) calloc(1, sizeof(char));
+   (tp->x)[0] = '\0';
    tp->len = 0;
    tp->size = 0;
    tp->extend = 1;
@@ -49,8 +51,8 @@ varstr_new(void)
 int
 varstr_free(struct varstr **pp)
 {
-   _FREE((*pp)->x);
-   _FREE(*pp);
+   FREE((*pp)->x);
+   FREE(*pp);
    *pp = NULL;
 
    return 0;
@@ -59,7 +61,7 @@ varstr_free(struct varstr **pp)
 const char *
 varstr_version(void)
 {
-   return "3.0.0-dev0";
+   return "3.1.1-dev0";
 }
 
 int
@@ -71,7 +73,7 @@ varstr_buffersize(struct varstr *p, unsigned size, unsigned extend)
 
       cp = realloc(p->x, size * sizeof(char));
 
-      if (_IS_NULL(cp))
+      if (IS_NULL(cp))
          return 1;
 
       p->x = cp;
@@ -96,7 +98,7 @@ varstr_cat(struct varstr *p, char *x)
 
    if (need >= p->size) {
       p->x = (char *) realloc(p->x, (need + p->extend) * sizeof(*(p->x)));
-      if (_IS_NULL(p->x)) {
+      if (IS_NULL(p->x)) {
          fprintf(stderr, "[ERROR] %s %d: Cannot allocate memory\n", __FILE__, __LINE__);
          exit(1);
       }
@@ -122,7 +124,7 @@ varstr_catc(struct varstr *p, char x)
 
    if (need >= p->size) {
       p->x = (char *) realloc(p->x, (need + p->extend) * sizeof(char));
-      if (_IS_NULL(p->x)) {
+      if (IS_NULL(p->x)) {
          fprintf(stderr, "[ERROR] %s %d: Cannot allocate memory\n", __FILE__, __LINE__);
          exit(1);
       }
@@ -137,20 +139,7 @@ varstr_catc(struct varstr *p, char x)
 void
 varstr_chomp(struct varstr *p)
 {
-   char       *cp = varstr_str(p);
-   unsigned    i = p->len;
-
-   if (p->len == 0)
-      return;
-
-   while (i > 0) {
-      i -= 1;
-      if (!isspace(cp[i]))
-         break;
-   }
-
-   cp[i + 1] = '\0';
-   p->len = i + 1;
+   varstr_rtrim(p);
 }
 
 void
@@ -159,17 +148,14 @@ varstr_compact(struct varstr *p)
    unsigned    i, j;
 
    for (i = 0, j = 0; i < p->len; i++) {
-
       if (isspace((p->x)[i]))
          continue;
-
       (p->x)[j] = (p->x)[i];
-
-      j += 1;
+      j++;
    }
 
-   (p->x)[j] = '\0';
    p->len = j;
+   (p->x)[p->len] = '\0';
 }
 
 void
@@ -197,31 +183,77 @@ varstr_init(struct varstr *p, unsigned extend)
 void
 varstr_lrtrim(struct varstr *p)
 {
-   char       *cp = p->x;
+   varstr_ltrim(p);
+   varstr_rtrim(p);
+}
+
+void
+varstr_ltrim(struct varstr *p)
+{
    unsigned    i = 0, j = 0;
 
    while (i < p->len) {
-      if (!isspace(cp[i]))
+      if (!isspace((p->x)[i]))
          break;
-      i += 1;
+      i++;
    }
 
    while (i < p->len) {
-      cp[j] = cp[i];
-      i += 1;
-      j += 1;
+      (p->x)[j] = (p->x)[i];
+      i++;
+      j++;
    }
 
    p->len = j;
-   cp[p->len] = '\n';
+   (p->x)[p->len] = '\0';
+}
 
-   varstr_chomp(p);
+void
+varstr_rtrim(struct varstr *p)
+{
+   unsigned    i = p->len;
+
+   if (p->len == 0)
+      return;
+
+   while (i > 0) {
+      i--;
+      if (!isspace((p->x)[i]))
+         goto DONE;
+   }
+
+   /* ... and if we're here the varstr is entirely whitespace */
+
+   p->len = 0;
+   (p->x)[p->len] = '\0';
+   return;
+
+ DONE:
+
+   p->len = i + 1;
+   (p->x)[p->len] = '\0';
 }
 
 char       *
 varstr_str(struct varstr *p)
 {
    return p->x;
+}
+
+void
+varstr_tolower(struct varstr *p)
+{
+   unsigned    i;
+   for (i = 0; i < p->len; i++)
+      (p->x)[i] = tolower((unsigned char) (p->x)[i]);
+}
+
+void
+varstr_toupper(struct varstr *p)
+{
+   unsigned    i;
+   for (i = 0; i < p->len; i++)
+      (p->x)[i] = toupper((unsigned char) (p->x)[i]);
 }
 
 char       *
@@ -231,5 +263,5 @@ varstr_to_s(struct varstr *p)
    return strcpy(str, p->x);
 }
 
-#undef _IS_NULL
-#undef _FREE
+#undef IS_NULL
+#undef FREE

@@ -10,6 +10,7 @@ LDFLAGS =
 LDFLAGS_EFENCE = -L/usr/local/lib -lefence $(LDFLAGS)
 #VALGRIND_FLAGS = --verbose --leak-check=full --undef-value-errors=yes --track-origins=yes
 VALGRIND_FLAGS =  --leak-check=summary --undef-value-errors=yes --track-origins=yes
+STAMPER = stamper
 
 INDENT_FLAGS = -TFILE -Tsize_t -Tuint8_t -Tuint16_t -Tuint32_t -Tuint64_t
 
@@ -72,8 +73,8 @@ indent:
 	@indent $(INDENT_FLAGS) ex/ex02.c
 
 stamp:
-	@stamper.bash fareader.c
-	@stamper.bash fareader.h
+	@$(STAMPER) fareader.c
+	@$(STAMPER) fareader.h
 
 clean:
 	@/bin/rm -f *.o *~ *.BAK *.bak core.*

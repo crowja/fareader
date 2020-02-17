@@ -1,18 +1,13 @@
 /**
  *  @file fareader.h
  *  @version 0.9.0-dev0
- *  @date Tue Dec 10 15:17:30 CST 2019
- *  @copyright 2020 John A. Crow <crowja@gmail.com>
+ *  @date Sun Feb 16, 2020 07:47:25 PM CST
+ *  @copyright 2019-2020 John A. Crow <crowja@gmail.com>
  *  @license Unlicense <http://unlicense.org/>
  */
 
-#ifndef _FAREADER_H_
-#define _FAREADER_H_
-
-#ifdef  _PACKAGE_NAME
-#undef  _PACKAGE_NAME
-#endif
-#define _PACKAGE_NAME "fareader"
+#ifndef FAREADER_H
+#define FAREADER_H
 
 struct fareader;
 
